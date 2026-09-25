@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+resume_screener.db
+uploads/
+.pytest_cache/
+
+mingit/
+mingit.zip

@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Screener | Semantic Talent Matching</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --dark: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --card-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+            --card-hover-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            color: var(--slate-800);
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+        }
+
+        .container {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.6);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .brand-text h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text p {
+            font-size: 13px;
+            color: var(--slate-500);
+            font-weight: 500;
+        }
+
+        .header-badges {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .badge-model {
+            background: #e0e7ff;
+            color: var(--primary);
+            border: 1px solid #c7d2fe;
+        }
+
+        .badge-api {
+            background: white;
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+            transition: all 0.2s ease;
+        }
+
+        .badge-api:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 2px var(--success-light);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Two-Column Grid */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 860px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.25s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--slate-800);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-icon {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .char-counter {
+            font-size: 12px;
+            color: var(--slate-400);
+            font-weight: 500;
+        }
+
+        /* Job Description Area */
+        textarea {
+            width: 100%;
+            height: 220px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--slate-200);
+            background: var(--slate-50);
+            color: var(--slate-800);
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        textarea:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .presets {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .presets-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--slate-500);
+        }
+
+        .preset-btn {
+            background: var(--slate-100);
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .preset-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: #c7d2fe;
+        }
+
+        /* Drag and Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--slate-300);
+            background: var(--slate-50);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: scale(1.01);
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .drop-zone-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--slate-700);
+            margin-bottom: 4px;
+        }
+
+        .drop-zone-subtext {
+            font-size: 12px;
+            color: var(--slate-400);
+        }
+
+        /* File list */
+        .file-list-container {
+            margin-top: 14px;
+            max-height: 140px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .file-chip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--slate-100);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--slate-700);
+            border: 1px solid var(--slate-200);
+        }
+
+        .file-chip-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-type-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .badge-pdf { background: #fee2e2; color: #b91c1c; }
+        .badge-docx { background: #e0f2fe; color: #0369a1; }
+
+        .file-remove-btn {
+            background: none;
+            border: none;
+            color: var(--slate-400);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+
+        .file-remove-btn:hover {
+            color: var(--danger);
+        }
+
+        /* Controls */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #4338ca 100%);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.45);
+        }
+
+        .btn-primary:disabled {
+            background: var(--slate-300);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--slate-700);
+            border: 1px solid var(--slate-300);
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--slate-100);
+            border-color: var(--slate-400);
+        }
+
+        /* Loading Spinner & Progress */
+        #loadingContainer {
+            display: none;
+            background: white;
+            border-radius: 16px;
+            padding: 36px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--slate-200);
+            margin-bottom: 30px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--primary-light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--slate-800);
+            margin-bottom: 6px;
+        }
+
+        .loading-desc {
+            font-size: 13px;
+            color: var(--slate-500);
+        }
+
+        /* Results Dashboard */
+        #resultsSection {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 18px 20px;
+            border-radius: 14px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--slate-200);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .icon-blue { background: var(--primary-light); color: var(--primary); }
+        .icon-green { background: var(--success-light); color: var(--success); }
+        .icon-amber { background: var(--warning-light); color: var(--warning); }
+        .icon-purple { background: #fae8ff; color: #c026d3; }
+
+        .stat-info h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--slate-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-info p {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--slate-800);
+        }
+
+        /* Results Table Card */
+        .results-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--slate-200);
+            margin-bottom: 24px;
+        }
+
+        .results-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .search-box {
+            padding: 8px 14px;
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            font-size: 13px;
+            width: 240px;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: var(--primary);
+        }
+
+        .export-btn {
+            background: var(--success-light);
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .export-btn:hover {
+            background: #d1fae5;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th {
+            background: var(--slate-50);
+            color: var(--slate-600);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 2px solid var(--slate-200);
+        }
+
+        td {
+            padding: 16px;
+            font-size: 14px;
+            color: var(--slate-700);
+            border-bottom: 1px solid var(--slate-100);
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background-color: var(--slate-50);
+        }
+
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .rank-1 { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
+        .rank-2 { background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; }
+        .rank-3 { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+        .rank-default { background: var(--slate-100); color: var(--slate-600); }
+
+        .score-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 160px;
+        }
+
+        .score-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: var(--slate-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .score-val {
+            font-weight: 700;
+            font-size: 14px;
+            min-width: 42px;
+        }
+
+        .fill-high { background: linear-gradient(90deg, #10b981, #059669); }
+        .fill-medium { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+        .fill-low { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .fill-poor { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+        .tag-pill {
+            display: inline-block;
+            background: var(--slate-100);
+            color: var(--slate-700);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 2px;
+            border: 1px solid var(--slate-200);
+        }
+
+        .match-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .match-high { background: var(--success-light); color: var(--success); }
+        .match-medium { background: var(--primary-light); color: var(--primary); }
+        .match-low { background: var(--warning-light); color: var(--warning); }
+        .match-poor { background: var(--danger-light); color: var(--danger); }
+
+        /* Failed Section */
+        .failed-box {
+            background: var(--danger-light);
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 20px;
+        }
+
+        .failed-box h4 {
+            color: var(--danger);
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .failed-box ul {
+            padding-left: 20px;
+            color: #991b1b;
+            font-size: 13px;
+        }
+
+        /* Error Alert */
+        .error-banner {
+            display: none;
+            background: var(--danger-light);
+            border: 1px solid #f87171;
+            color: #991b1b;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Footer Disclaimer */
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--slate-200);
+            text-align: center;
+            font-size: 12px;
+            color: var(--slate-500);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header>
+        <div class="brand">
+            <div class="brand-icon">⚡</div>
+            <div class="brand-text">
+                <h1>AI Resume Screener</h1>
+                <p>Semantic NLP Document Matching & Ranking Engine</p>
+            </div>
+        </div>
+        <div class="header-badges">
+            <span class="badge badge-model">🧠 all-MiniLM-L6-v2</span>
+            <a href="/docs" target="_blank" class="badge badge-api">
+                <span class="pulse-dot"></span>
+                <span>Swagger REST API</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" class="error-banner"></div>
+
+    <!-- Main Workspace -->
+    <form id="screenerForm">
+        <div class="workspace-grid">
+            <!-- Left: Job Description Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-icon">📋</span>
+                        <span>Job Description (JD)</span>
+                    </div>
+                    <span id="charCount" class="char-counter">0 chars</span>
+                </div>
+                <textarea 
+                    id="jobDescription" 
+                    placeholder="Paste the target job description or requirements here..." 
+                    required></textarea>
+                
+                <div class="presets">
+                    <span class="presets-label">Quick Samples:</span>
+                    <button type="button" class="preset-btn" onclick="loadSample('python')">Backend Python/FastAPI</button>
+                    <button type="button" class="preset-btn" onclick="loadSample('ml')">ML / Deep Learning</button>
+                    <button type="button" class="preset-btn" onclick="loadSample('frontend')">React Frontend</button>
+                </div>
+            </div>
+
+            <!-- Right: Resume Upload Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-title-icon">📂</span>
+                        <span>Candidate Resumes</span>
+                    </div>
+                    <span id="fileCountBadge" class="char-counter">0 files selected</span>
+                </div>
+
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="fileInput" accept=".pdf,.docx" multiple required>
+                    <div class="upload-icon">📤</div>
+                    <div class="drop-zone-text">Click or Drag & Drop resumes here</div>
+                    <div class="drop-zone-subtext">Supports PDF & Word (.docx) • Up to 50 files • Max 5MB each</div>
+                </div>
+
+                <div id="fileListContainer" class="file-list-container"></div>
+            </div>
+        </div>
+
+        <!-- Submit & Actions -->
+        <div class="action-bar">
+            <button type="submit" id="submitBtn" class="btn-primary">
+                <span>🚀</span>
+                <span>Rank Candidates</span>
+            </button>
+            <button type="button" id="resetBtn" class="btn-secondary" onclick="resetForm()">Reset All</button>
+        </div>
+    </form>
+
+    <!-- Loading State -->
+    <div id="loadingContainer">
+        <div class="spinner"></div>
+        <div class="loading-title">Analyzing & Computing Semantic Embeddings...</div>
+        <div class="loading-desc">Parsing PDF/DOCX files, generating vector representations, and calculating cosine similarity.</div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultsSection">
+        <!-- Stats Summary -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">👥</div>
+                <div class="stat-info">
+                    <h4>Total Processed</h4>
+                    <p id="statTotal">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-green">🏆</div>
+                <div class="stat-info">
+                    <h4>Top Match Score</h4>
+                    <p id="statTopScore">0%</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-purple">📊</div>
+                <div class="stat-info">
+                    <h4>Average Score</h4>
+                    <p id="statAvgScore">0%</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon icon-amber">⭐</div>
+                <div class="stat-info">
+                    <h4>Strong Matches (>70%)</h4>
+                    <p id="statStrongMatches">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="results-card">
+            <div class="results-toolbar">
+                <div class="card-title">
+                    <span>🎯 Candidate Ranking Leaderboard</span>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="searchFilter" class="search-box" placeholder="Filter by candidate filename..." onkeyup="filterResults()">
+                    <button type="button" class="export-btn" onclick="exportCSV()">
+                        <span>📥</span>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Rank</th>
+                            <th>Candidate File</th>
+                            <th style="width: 250px;">Semantic Match Score</th>
+                            <th>Matched Keywords</th>
+                            <th style="width: 140px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Failed Files Section -->
+            <div id="failedContainer" style="display: none;" class="failed-box">
+                <h4>⚠️ Files with Extraction Issues</h4>
+                <ul id="failedList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advisory Disclaimer -->
+    <footer>
+        <strong>Advisory Notice:</strong> Match scores are calculated using cosine similarity of deep semantic text embeddings (Sentence-BERT). These scores serve as decision-support heuristics and should not be used as the sole basis for automated hiring decisions.
+    </footer>
+</div>
+
+<script>
+    let selectedFiles = [];
+    let currentResultsData = null;
+
+    const sampleJDs = {
+        python: `Senior Backend Engineer (Python / FastAPI)
+We are seeking an experienced Backend Engineer to build scalable microservices.
+Required Qualifications:
+- 3+ years of experience with Python, FastAPI, and asynchronous programming.
+- Strong knowledge of RESTful APIs, PostgreSQL, Redis, and Docker.
+- Experience with PyTorch or machine learning integration is a plus.
+- Solid background in writing automated unit tests and CI/CD pipelines.`,
+        ml: `Machine Learning / NLP Specialist
+Looking for an applied AI/ML Engineer to develop deep learning NLP pipelines.
+Requirements:
+- Strong proficiency in Python, PyTorch, HuggingFace, and Sentence-Transformers.
+- Experience building semantic search, embeddings, vector databases, and similarity metrics.
+- Background in data extraction, text processing (pdfplumber, docx), and feature engineering.
+- Solid knowledge of deployment with FastAPI, Uvicorn, and Docker.`,
+        frontend: `Full Stack React & Web Developer
+We are looking for a developer who excels at crafting modern, interactive user interfaces.
+Key Skills:
+- Proficiency in JavaScript (ES6+), HTML5, CSS3, React or modern vanilla JS.
+- Experience with responsive UI design, REST API consumption, and state management.
+- Familiarity with Python/Node.js backends and cloud deployments.`
+    };
+
+    // DOM Elements
+    const jdTextarea = document.getElementById('jobDescription');
+    const charCount = document.getElementById('charCount');
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileListContainer = document.getElementById('fileListContainer');
+    const fileCountBadge = document.getElementById('fileCountBadge');
+    const errorBanner = document.getElementById('errorBanner');
+    const loadingContainer = document.getElementById('loadingContainer');
+    const resultsSection = document.getElementById('resultsSection');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Char counter
+    jdTextarea.addEventListener('input', () => {
+        charCount.textContent = `${jdTextarea.value.length} chars`;
+    });
+
+    function loadSample(key) {
+        jdTextarea.value = sampleJDs[key] || '';
+        charCount.textContent = `${jdTextarea.value.length} chars`;
+    }
+
+    // Drag and Drop & File Handling
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        handleNewFiles(dt.files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleNewFiles(e.target.files);
+    });
+
+    function handleNewFiles(files) {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (['pdf', 'docx'].includes(ext)) {
+                if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    selectedFiles.push(file);
+                }
+            } else {
+                showError(`File "${file.name}" is unsupported. Only PDF and DOCX files are allowed.`);
+            }
+        }
+        updateFileListUI();
+    }
+
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        updateFileListUI();
+    }
+
+    function updateFileListUI() {
+        fileListContainer.innerHTML = '';
+        fileCountBadge.textContent = `${selectedFiles.length} file${selectedFiles.length === 1 ? '' : 's'} selected`;
+
+        selectedFiles.forEach((file, index) => {
+            const ext = file.name.split('.').pop().toLowerCase();
+            const sizeKB = (file.size / 1024).toFixed(0);
+
+            const chip = document.createElement('div');
+            chip.className = 'file-chip';
+            chip.innerHTML = `
+                <div class="file-chip-info">
+                    <span class="file-type-badge ${ext === 'pdf' ? 'badge-pdf' : 'badge-docx'}">${ext}</span>
+                    <span title="${file.name}">${file.name}</span>
+                    <span style="color: var(--slate-400); font-size: 11px;">(${sizeKB} KB)</span>
+                </div>
+                <button type="button" class="file-remove-btn" onclick="removeFile(${index})">✕</button>
+            `;
+            fileListContainer.appendChild(chip);
+        });
+    }
+
+    function showError(msg) {
+        errorBanner.textContent = msg;
+        errorBanner.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function clearError() {
+        errorBanner.textContent = '';
+        errorBanner.style.display = 'none';
+    }
+
+    function resetForm() {
+        jdTextarea.value = '';
+        charCount.textContent = '0 chars';
+        selectedFiles = [];
+        fileInput.value = '';
+        updateFileListUI();
+        clearError();
+        resultsSection.style.display = 'none';
+        currentResultsData = null;
+    }
+
+    let pollInterval = null;
+
+    // Form Submission
+    document.getElementById('screenerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearError();
+
+        const jd = jdTextarea.value.trim();
+        if (!jd) {
+            showError('Please provide a job description.');
+            return;
+        }
+
+        if (selectedFiles.length === 0) {
+            showError('Please select at least one PDF or Word (.docx) resume.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        loadingContainer.style.display = 'block';
+        resultsSection.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('job_description', jd);
+        selectedFiles.forEach(file => {
+            formData.append('resumes', file);
+        });
+
+        try {
+            const response = await fetch('/api/jobs', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.detail || 'Failed to process ranking request.');
+            }
+
+            const data = await response.json();
+            
+            // Start polling the job status
+            pollJobStatus(data.job_id);
+
+        } catch (err) {
+            showError(err.message);
+            submitBtn.disabled = false;
+            loadingContainer.style.display = 'none';
+        }
+    });
+
+    async function pollJobStatus(jobId) {
+        document.querySelector('.loading-desc').innerHTML = 'Initializing background job...';
+        
+        pollInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/jobs/${jobId}`);
+                if (!res.ok) throw new Error('Failed to fetch job status');
+                
+                const data = await res.json();
+                
+                // Update progress UI
+                document.querySelector('.loading-desc').innerHTML = `Processing files: ${data.processed_files} / ${data.total_files} (${data.progress_percentage}%)`;
+                
+                if (data.status === 'completed' || data.status === 'failed') {
+                    clearInterval(pollInterval);
+                    currentResultsData = data;
+                    renderResults(data);
+                    submitBtn.disabled = false;
+                    loadingContainer.style.display = 'none';
+                }
+            } catch (err) {
+                clearInterval(pollInterval);
+                showError('Error checking job status.');
+                submitBtn.disabled = false;
+                loadingContainer.style.display = 'none';
+            }
+        }, 1500); // poll every 1.5 seconds
+    }
+
+    function renderResults(data) {
+        const results = data.results || [];
+        const failed = data.failed || [];
+
+        // Update stats
+        document.getElementById('statTotal').textContent = results.length;
+        if (results.length > 0) {
+            const scores = results.map(r => r.score);
+            const topScore = Math.max(...scores);
+            const avgScore = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+            const strongCount = results.filter(r => r.score >= 70).length;
+
+            document.getElementById('statTopScore').textContent = `${topScore.toFixed(1)}%`;
+            document.getElementById('statAvgScore').textContent = `${avgScore}%`;
+            document.getElementById('statStrongMatches').textContent = strongCount;
+        } else {
+            document.getElementById('statTopScore').textContent = '0%';
+            document.getElementById('statAvgScore').textContent = '0%';
+            document.getElementById('statStrongMatches').textContent = '0';
+        }
+
+        renderTableRows(results);
+
+        // Render Failed Files
+        const failedContainer = document.getElementById('failedContainer');
+        const failedList = document.getElementById('failedList');
+        if (failed.length > 0) {
+            failedList.innerHTML = '';
+            failed.forEach(f => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${f.filename}</strong>: ${f.error}`;
+                failedList.appendChild(li);
+            });
+            failedContainer.style.display = 'block';
+        } else {
+            failedContainer.style.display = 'none';
+        }
+
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function renderTableRows(results) {
+        const tbody = document.getElementById('resultsBody');
+        tbody.innerHTML = '';
+
+        if (results.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--slate-400);">No matching candidates found.</td></tr>`;
+            return;
+        }
+
+        results.forEach(res => {
+            let rankClass = 'rank-default';
+            if (res.rank === 1) rankClass = 'rank-1';
+            else if (res.rank === 2) rankClass = 'rank-2';
+            else if (res.rank === 3) rankClass = 'rank-3';
+
+            let fillClass = 'fill-poor';
+            let matchBadge = '<span class="match-badge match-poor">Low Match</span>';
+            if (res.score >= 75) {
+                fillClass = 'fill-high';
+                matchBadge = '<span class="match-badge match-high">High Match</span>';
+            } else if (res.score >= 55) {
+                fillClass = 'fill-medium';
+                matchBadge = '<span class="match-badge match-medium">Moderate</span>';
+            } else if (res.score >= 40) {
+                fillClass = 'fill-low';
+                matchBadge = '<span class="match-badge match-low">Fair Match</span>';
+            }
+
+            const ext = res.filename.split('.').pop().toLowerCase();
+            const typeBadge = `<span class="file-type-badge ${ext === 'pdf' ? 'badge-pdf' : 'badge-docx'}">${ext}</span>`;
+
+            const kwHtml = (res.matched_keywords && res.matched_keywords.length > 0)
+                ? res.matched_keywords.map(k => `<span class="tag-pill">${k}</span>`).join('')
+                : `<span style="color: var(--slate-400); font-size: 12px;">Semantic match</span>`;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="rank-badge ${rankClass}">${res.rank}</span></td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        ${typeBadge}
+                        <strong>${res.filename}</strong>
+                    </div>
+                </td>
+                <td>
+                    <div class="score-bar-container">
+                        <div class="score-bar-bg">
+                            <div class="score-bar-fill ${fillClass}" style="width: ${Math.min(100, Math.max(0, res.score))}%"></div>
+                        </div>
+                        <span class="score-val">${res.score.toFixed(1)}%</span>
+                    </div>
+                </td>
+                <td>${kwHtml}</td>
+                <td>${matchBadge}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function filterResults() {
+        if (!currentResultsData || !currentResultsData.results) return;
+        const q = document.getElementById('searchFilter').value.toLowerCase();
+        const filtered = currentResultsData.results.filter(r => r.filename.toLowerCase().includes(q));
+        renderTableRows(filtered);
+    }
+
+    function exportCSV() {
+        if (!currentResultsData || !currentResultsData.results || currentResultsData.results.length === 0) {
+            alert('No results available to export.');
+            return;
+        }
+
+        let csvContent = 'data:text/csv;charset=utf-8,';
+        csvContent += 'Rank,Filename,Score (0-100),Matched Keywords\n';
+
+        currentResultsData.results.forEach(r => {
+            const keywords = (r.matched_keywords || []).join('; ');
+            csvContent += `${r.rank},"${r.filename}",${r.score.toFixed(1)},"${keywords}"\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `resume_screener_results_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+</body>
+</html>
