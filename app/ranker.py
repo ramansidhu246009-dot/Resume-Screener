@@ -129,5 +129,3 @@ def process_job_background(job_id: str, file_paths: dict[str, str]):
     db.commit()
     db.close()
     print(f"[{job_id}] Job finished in {time.time()-t_start:.2f}s total")
-sqlalchemy
-psycopg2-binary
