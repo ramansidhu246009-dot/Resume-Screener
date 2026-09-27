@@ -34,7 +34,7 @@ static_dir = os.path.join(current_dir, "static")
 if not os.path.exists(static_dir):
     os.makedirs(static_dir)
 
-uploads_dir = os.path.join(current_dir, "uploads")
+uploads_dir = "/tmp/uploads"
 if not os.path.exists(uploads_dir):
     os.makedirs(uploads_dir)
 
